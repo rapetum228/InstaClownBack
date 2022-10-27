@@ -17,7 +17,7 @@ internal class Program
 
         builder.Services.AddDbContext<DAL.DataContext>(options =>
         {
-            options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { });
+            options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { }); //указали имя строки подключения из appsettings.json
         });
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
@@ -27,7 +27,7 @@ internal class Program
 
         var app = builder.Build();
 
-
+        //выполнение автоматической миграции при запуске, полезно при обновлении разных БД
         using (var serviceScope = ((IApplicationBuilder)app).ApplicationServices.GetService<IServiceScopeFactory>()?.CreateScope())
         {
             if (serviceScope != null)
@@ -38,7 +38,7 @@ internal class Program
         }
 
         // Configure the HTTP request pipeline.
-        //if (app.Environment.IsDevelopment())
+        //if (app.Environment.IsDevelopment()) - подключение к свагеру не только во время разработки, но и, например, при использовании сервера
         {
             app.UseSwagger();
             app.UseSwaggerUI();

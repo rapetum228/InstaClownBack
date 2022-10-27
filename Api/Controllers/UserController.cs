@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]/[action]")] //in default "api/[controller]". Addition [action] views controller method names (CreateUser,GetUsers..)
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -20,6 +20,8 @@ namespace Api.Controllers
             _userService = userService;
         }
 
+        //url with action: api/User/CreateUser
+        //url without action: api/User
         [HttpPost]
         public async Task CreateUser(CreateUserModel model)=> await _userService.CreateUser(model);
 
