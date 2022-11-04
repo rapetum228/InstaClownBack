@@ -14,10 +14,18 @@ namespace DAL
         {
 
         }
-
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            //TODO: отдельный метод в отдельном классе
+            modelBuilder
+                .Entity<User>()
+                .HasIndex(f => f.Email)
+                .IsUnique(); //уникальность email
+        }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(b => b.MigrationsAssembly("Api"));
 
         public DbSet<User> Users => Set<User>();
+        public DbSet<UserSession> UserSessions => Set<UserSession>();
     }
 }
