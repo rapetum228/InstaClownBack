@@ -120,6 +120,7 @@ internal class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseExceptions();
         app.UseTokenValidator();
         app.MapControllers();
 

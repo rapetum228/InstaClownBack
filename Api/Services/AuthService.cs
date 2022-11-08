@@ -9,12 +9,13 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Api.Exceptions;
 
 namespace Api.Services
 {
     public class AuthService
     {
-        private readonly DAL.DataContext _context;
+        private readonly DataContext _context;
         private readonly AuthConfig _config; //конфигурации токена
 
         public AuthService(DataContext context, IOptions<AuthConfig> config)
@@ -27,10 +28,10 @@ namespace Api.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == login.ToLower());
             if (user == null)
-                throw new Exception("User not found");
+                throw new NotFoundException("User not found!");
 
             if (!PasswordHash.ValidatePassword(password, user.PasswordHash))
-                throw new Exception("Okay gime me your p[ass]word"); //Password is incorrect
+                throw new Exception("Okay give me correct p[ass]word"); //Password is incorrect
 
             return user;
         }
