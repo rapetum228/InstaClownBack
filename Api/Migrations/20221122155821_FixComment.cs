@@ -6,26 +6,26 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class AddAuthorIdinPost : Migration
+    public partial class FixComment : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<Guid>(
-                name: "CommentId",
+                name: "ResponseCommentId",
                 table: "Comments",
                 type: "uuid",
                 nullable: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Comments_CommentId",
+                name: "IX_Comments_ResponseCommentId",
                 table: "Comments",
-                column: "CommentId");
+                column: "ResponseCommentId");
 
             migrationBuilder.AddForeignKey(
-                name: "FK_Comments_Comments_CommentId",
+                name: "FK_Comments_Comments_ResponseCommentId",
                 table: "Comments",
-                column: "CommentId",
+                column: "ResponseCommentId",
                 principalTable: "Comments",
                 principalColumn: "Id");
         }
@@ -34,15 +34,15 @@ namespace Api.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropForeignKey(
-                name: "FK_Comments_Comments_CommentId",
+                name: "FK_Comments_Comments_ResponseCommentId",
                 table: "Comments");
 
             migrationBuilder.DropIndex(
-                name: "IX_Comments_CommentId",
+                name: "IX_Comments_ResponseCommentId",
                 table: "Comments");
 
             migrationBuilder.DropColumn(
-                name: "CommentId",
+                name: "ResponseCommentId",
                 table: "Comments");
         }
     }

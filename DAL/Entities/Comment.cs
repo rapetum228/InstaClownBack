@@ -11,7 +11,8 @@ namespace DAL.Entities
         public Guid Id { get; set; }
         public string Text { get; set; } = null!;
         public DateTimeOffset DateTimeWriting { get; set; }
-        public virtual ICollection<Comment>? Comments { get; set; }
+        public Comment? ResponseComment { get; set; }
+        //public virtual ICollection<Comment>? Comments { get; set; }
         public Guid UserId { get; set; }
         public virtual User User { get; set; } = null!;
         public Guid PostId { get; set; }
