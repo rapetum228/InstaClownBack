@@ -27,6 +27,11 @@ namespace DAL
                .IsUnique();
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
             modelBuilder.Entity<PostAttach>().ToTable(nameof(PostAttaches));
+
+            modelBuilder.Entity<User>().HasIndex(p => p.Email).IsUnique();
+            modelBuilder.Entity<User>().HasIndex(p => p.Name).IsUnique();
+
+
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
             => optionsBuilder.UseNpgsql(b => b.MigrationsAssembly("Api"));

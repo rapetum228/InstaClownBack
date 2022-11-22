@@ -15,10 +15,11 @@ namespace DAL.Entities
         public DateTimeOffset BirthDate { get; set; }
         public bool IsDeleted { get; set; }
 
-        public virtual ICollection<Post>? Posts { get; set; } 
-        public virtual ICollection<User>? Subscribers { get; set; } 
         public Guid? AvatarId { get; set; }
         public virtual Avatar? Avatar { get; set; }
         public virtual ICollection<UserSession>? Sessions { get; set; }
+        public virtual ICollection<Post>? Posts { get; set; } 
+        public virtual ICollection<User>? Subscriptions { get; set; }
+        public virtual ICollection<User>? Subscribers { get; set; } 
     }
 }

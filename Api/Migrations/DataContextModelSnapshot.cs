@@ -162,9 +162,6 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AvatarId")
@@ -175,8 +172,6 @@ namespace Api.Migrations
 
                     b.HasIndex("Name")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Users");
                 });
@@ -204,6 +199,21 @@ namespace Api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSessions");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.Property<Guid>("SubscribersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubscriptionsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SubscribersId", "SubscriptionsId");
+
+                    b.HasIndex("SubscriptionsId");
+
+                    b.ToTable("UserUser");
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>
@@ -297,10 +307,6 @@ namespace Api.Migrations
                         .WithOne("User")
                         .HasForeignKey("DAL.Entities.User", "AvatarId");
 
-                    b.HasOne("DAL.Entities.User", null)
-                        .WithMany("Subscribers")
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Avatar");
                 });
 
@@ -313,6 +319,21 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.HasOne("DAL.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscriptionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>
@@ -355,8 +376,6 @@ namespace Api.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Sessions");
-
-                    b.Navigation("Subscribers");
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>

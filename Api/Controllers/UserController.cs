@@ -71,6 +71,41 @@ namespace Api.Controllers
 
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task SubscribeToUser(Guid userId, Guid? subscriberId)
+        {
+            if (subscriberId == default)
+            {
+                var currentUser = await GetCurrentUser();
+                subscriberId = currentUser.Id;
+            }
+            await _userService.SubscribeToUser(userId, subscriberId!.Value);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task UnsubscribeFromUser(Guid userId, Guid? subscriberId)
+        {
+            if (subscriberId == default)
+            {
+                var currentUser = await GetCurrentUser();
+                subscriberId = currentUser.Id;
+            }
+            await _userService.UnsubscribeFromUser(userId, subscriberId!.Value);
+        }
+
+        [HttpGet]
+        public async Task<List<UserSimpleModel>> GetUserSubscriptions(Guid userId)
+        {
+            return await _userService.GetUserSubscriptions(userId);
+        }
+        [HttpGet]
+        public async Task<List<UserSimpleModel>> GetUserSubscribers(Guid userId)
+        {
+            return await _userService.GetUserSubscribers(userId);
+        }
+
         [HttpGet]
         public async Task<FileResult> GetUserAvatar(Guid userId)
         {
