@@ -8,4 +8,11 @@
         public string? ContentLink { get; set; } = null!;
 
     }
+
+    public class AttachSimpleExternalModel
+    {
+        public Guid Id { get; set; }
+        public string? ContentLink { get; set; } = null!;
+
+    }
 }

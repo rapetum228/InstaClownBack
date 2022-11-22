@@ -43,6 +43,7 @@ namespace Api.Services
             var posts = await _context.Posts.Include(p => p.Attachments)//.ThenInclude(a=>a.Author)
                                       .Include(p=>p.Author)
                                       .ThenInclude(x => x.Avatar)
+                                      .Include(p=>p.Likes)
                                       .Where(p=>p.AuthorId == userId)
                                       .OrderByDescending(x => x.DateTimeCreation)
                                       .AsNoTracking().ToListAsync();
@@ -57,6 +58,41 @@ namespace Api.Services
             return _mapper.Map<AttachModel>(content);
         } 
 
+        public async Task LikePost(LikeRequest likeRequest)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p=>p.Id == likeRequest.PostId);
+            if (post == default)
+            {
+                throw new Exception("Post not found");
+            }
+            var like = await _context.Likes.FirstOrDefaultAsync(l=>l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
+            if (like != default)
+            {
+                throw new Exception("You already liked this post");
+            }
+
+            var likeDb = _mapper.Map<Like>(likeRequest);
+            await _context.Likes.AddAsync(likeDb);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DislikePost(LikeRequest likeRequest)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == likeRequest.PostId);
+            if (post == default)
+            {
+                throw new Exception("Post not found");
+            }
+            var like = await _context.Likes.FirstOrDefaultAsync(l => l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
+            if (like == default)
+            {
+                throw new Exception("You don't liked this post");
+            }
+
+            
+            _context.Likes.Remove(like);
+            await _context.SaveChangesAsync();
+        }
         private void MoveAttach(MetadataLinkModel model, Guid authorId)
         {
             model.AuthorId = authorId;

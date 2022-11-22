@@ -20,7 +20,10 @@ namespace Api.Mapper
                 .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate))
                 .ForMember(d => d.PostsCount, m => m.MapFrom(s => s.Posts!.Count))
                 .AfterMap<UserAvatarMapperAction>();
-
+            CreateMap<User, UserAvatarModel>()
+                .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate))
+                .ForMember(d => d.PostsCount, m => m.MapFrom(s => s.Posts!.Count))
+                .AfterMap<UserAvatarMapperAction>();
 
             CreateMap<CommentRequestModel, Comment>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
@@ -46,12 +49,12 @@ namespace Api.Mapper
                 .ForMember(d => d.DateTimeCreation, m => m.MapFrom(s => s.DateTimeCreation.UtcDateTime));
             CreateMap<CreatePostRequest, CreatePostModel>();
             CreateMap<Post, PostModel>()
-                .ForMember(pm => pm.Contents, p => p.MapFrom(s => s.Attachments));
+                .ForMember(pm => pm.Contents, p => p.MapFrom(s => s.Attachments))
+                .ForMember(d => d.LikesCount, m => m.MapFrom(s => s.Likes!.Count));
 
-            CreateMap<User, UserAvatarModel>()
-                .ForMember(d => d.BirthDate, m => m.MapFrom(s => s.BirthDate))
-                .ForMember(d => d.PostsCount, m => m.MapFrom(s => s.Posts!.Count))
-                .AfterMap<UserAvatarMapperAction>();
+            CreateMap<LikeRequest, Like>();
+
+
         }
     }
 }
