@@ -48,6 +48,27 @@ namespace Api.Controllers
 
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task LikePost(LikeRequest likeRequest)
+        {
+            if (likeRequest.UserId == default)
+            {
+                likeRequest.UserId = GetCurrentUserId();
+            }
+            await _postService.LikePost(likeRequest);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task DislikePost(LikeRequest likeRequest)
+        {
+            if (likeRequest.UserId == default)
+            {
+                likeRequest.UserId = GetCurrentUserId();
+            }
+            await _postService.DislikePost(likeRequest);
+        }
 
         private Guid GetCurrentUserId()
         {

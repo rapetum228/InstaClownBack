@@ -38,5 +38,6 @@ namespace DAL
         public DbSet<Comment> Comments => Set<Comment>();
         public DbSet<Post> Posts => Set<Post>();
         public DbSet<PostAttach> PostAttaches => Set<PostAttach>();
+        public DbSet<Like> Likes => Set<Like>();
     }
 }
