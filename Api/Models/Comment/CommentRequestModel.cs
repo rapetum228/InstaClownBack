@@ -24,7 +24,7 @@ namespace Api.Models
         public Guid PostId { get; set; }
         public UserSimpleModel User { get; set; } = null!;
         public string Text { get; set; } = null!;
-        public Guid? CommentId { get; set; } 
+        public Guid? ResponseCommentId { get; set; } 
         public DateTimeOffset DateTimeWriting { get; set; }
     }
 }

@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221122093421_FixAttach")]
-    partial class FixAttach
+    [Migration("20221122155821_FixComment")]
+    partial class FixComment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -64,13 +64,13 @@ namespace Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("CommentId")
-                        .HasColumnType("uuid");
-
                     b.Property<DateTimeOffset>("DateTimeWriting")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ResponseCommentId")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Text")
@@ -82,9 +82,9 @@ namespace Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("CommentId");
-
                     b.HasIndex("PostId");
+
+                    b.HasIndex("ResponseCommentId");
 
                     b.HasIndex("UserId");
 
@@ -220,15 +220,15 @@ namespace Api.Migrations
 
             modelBuilder.Entity("DAL.Entities.Comment", b =>
                 {
-                    b.HasOne("DAL.Entities.Comment", null)
-                        .WithMany("Comments")
-                        .HasForeignKey("CommentId");
-
                     b.HasOne("DAL.Entities.Post", "Post")
                         .WithMany("Comments")
                         .HasForeignKey("PostId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("DAL.Entities.Comment", "ResponseComment")
+                        .WithMany()
+                        .HasForeignKey("ResponseCommentId");
 
                     b.HasOne("DAL.Entities.User", "User")
                         .WithMany()
@@ -237,6 +237,8 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
+
+                    b.Navigation("ResponseComment");
 
                     b.Navigation("User");
                 });
@@ -300,11 +302,6 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Post");
-                });
-
-            modelBuilder.Entity("DAL.Entities.Comment", b =>
-                {
-                    b.Navigation("Comments");
                 });
 
             modelBuilder.Entity("DAL.Entities.Post", b =>

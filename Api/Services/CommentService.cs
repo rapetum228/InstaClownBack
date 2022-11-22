@@ -39,7 +39,7 @@ namespace Api.Services
                 throw new Exception("Post not found");
             }
             var comments = await _context.Comments.AsNoTracking().Include(c => c.User).ThenInclude(u => u.Avatar)
-                                                  .Include(c => c.Comments)
+                                                  .Include(c => c.ResponseComment)
                                                   .Where(c => c.PostId == postId)
                                                   .ToListAsync();
 
@@ -52,21 +52,22 @@ namespace Api.Services
             var commentForComment = await GetComment(commentRequest.CommentId); //есть ли коммент
             var commentator = await GetUser(commentRequest.AuthorId); //есть ли юзер
 
-            if (commentForComment.Comments is null)
-            {
-                commentForComment.Comments = new List<Comment>();
-            }
+            //if (commentForComment.Comments is null)
+            //{
+            //    commentForComment.Comments = new List<Comment>();
+            //}
             var comment = _mapper.Map<Comment>(commentRequest);
             comment.UserId = commentator.Id;
             comment.PostId = commentForComment.PostId;
-            commentForComment.Comments.Add(comment);
+            //commentForComment.Comments.Add(comment);
+            commentForComment.ResponseComment = comment;
 
             await _context.SaveChangesAsync();
         }
 
         public async Task<Comment> GetComment(Guid commentId)
         {
-            var comment = await _context.Comments.Include(c => c.Post).Include(c => c.Comments).FirstOrDefaultAsync(u => u.Id == commentId);
+            var comment = await _context.Comments/*.Include(c => c.Post).Include(c => c.Comments)*/.FirstOrDefaultAsync(u => u.Id == commentId);
             if (comment == null)
             {
                 throw new Exception("Comment not found");

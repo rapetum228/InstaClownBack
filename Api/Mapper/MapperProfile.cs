@@ -25,8 +25,8 @@ namespace Api.Mapper
             CreateMap<CommentRequestModel, Comment>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.DateTimeWriting, m => m.MapFrom(s => s.DateTimeWriting==null?DateTime.UtcNow:s.DateTimeWriting));
-            CreateMap<Comment, CommentModel>();
-                //.ForMember(d => d.CommentId, m => m.MapFrom(s => s.Comments.Count == 0 ? null:)) ;
+            CreateMap<Comment, CommentModel>()
+                .ForMember(d => d.ResponseCommentId, m => m.MapFrom(s => s.ResponseComment!.Id)) ;
             CreateMap<CommentToCommentRequestModel, Comment>()
                 //.ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.DateTimeWriting, m => m.MapFrom(s => s.DateTimeWriting == null ? DateTime.UtcNow : s.DateTimeWriting));
