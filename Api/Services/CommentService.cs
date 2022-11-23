@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Exceptions;
+using Api.Models;
 using AutoMapper;
 using DAL;
 using DAL.Entities;
@@ -30,6 +31,37 @@ namespace Api.Services
 
         }
 
+        public async Task RemoveComment(CommentSimpleModel commentModel)
+        {
+            var user = await GetUser(commentModel.UserId);
+            var comment = await _context.Comments.Include(c=>c.User).FirstOrDefaultAsync(c=>c.Id==commentModel.Id);
+            if (comment == default)
+            {
+                throw new CommentNotFoundException();
+            }
+            if (comment.UserId != commentModel.UserId)
+            {
+                throw new Exception("You can't delete someone else's comment");
+            }
+            comment.IsDeleted = true;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task RestoreComment(CommentSimpleModel commentModel)
+        {
+            var user = await GetUser(commentModel.UserId);
+            var comment = await _context.Comments.Include(c => c.User).FirstOrDefaultAsync(c => c.Id == commentModel.Id);
+            if (comment == default)
+            {
+                throw new CommentNotFoundException();
+            }
+            if (comment.UserId != commentModel.UserId)
+            {
+                throw new Exception("You can't restore someone else's comment");
+            }
+            comment.IsDeleted = false;
+            await _context.SaveChangesAsync();
+        }
         public async Task<List<CommentModel>> GetPostComments(Guid postId)
         {
             var post = await _context.Posts.AsNoTracking()

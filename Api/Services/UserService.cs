@@ -41,7 +41,7 @@ namespace Api.Services
         {
             var user = await _context.Users.Include(x => x.Avatar).FirstOrDefaultAsync(x => x.Id == id);
             if (user == null)
-                throw new NotFoundException("User not found!");
+                throw new UserNotFoundException();
             return user;
         }
         public async Task<UserModel> GetUser(Guid id)
@@ -61,7 +61,7 @@ namespace Api.Services
                                            .FirstOrDefaultAsync(u => u.Id == userId);
             if (user == default)
             {
-                throw new NotFoundException("User not found");
+                throw new UserNotFoundException();
             }
             var subscriptions = _mapper.Map<List<UserSimpleModel>>(user.Subscriptions);
             return subscriptions;
@@ -76,7 +76,7 @@ namespace Api.Services
                                            .FirstOrDefaultAsync(u => u.Id == userId);
             if (user == default)
             {
-                throw new NotFoundException("User not found");
+                throw new UserNotFoundException();
             }
             var subscriptions = _mapper.Map<List<UserSimpleModel>>(user.Subscriptions);
             return subscriptions;
@@ -92,7 +92,7 @@ namespace Api.Services
             var subscriber = await GetUserById(subscriberId);
             if (user == default)
             {
-                throw new Exception("User not found");
+                throw new UserNotFoundException();
             }
             if (user.Subscribers is null)
             {
@@ -112,7 +112,7 @@ namespace Api.Services
             var subscriber = await GetUserById(subscriberId);
             if (user == default)
             {
-                throw new Exception("User not found");
+                throw new UserNotFoundException();
             }
             
             if (user.Subscribers is null || !user.Subscribers.Select(u => u.Id).Contains(subscriberId))

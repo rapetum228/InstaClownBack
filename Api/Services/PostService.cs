@@ -1,4 +1,5 @@
-﻿using Api.Models;
+﻿using Api.Exceptions;
+using Api.Models;
 using AutoMapper;
 using DAL;
 using DAL.Entities;
@@ -23,7 +24,7 @@ namespace Api.Services
             var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == postRequest.AuthorId);
             if (user == null)
             {
-                throw new Exception("User not found");
+                throw new UserNotFoundException();
             }
 
             var createPostModel = _mapper.Map<CreatePostModel>(postRequest);
@@ -52,6 +53,16 @@ namespace Api.Services
 
         }
 
+        public async Task<List<PostModel>> GetPosts(int skip, int take)
+        {
+            var posts = await _context.Posts
+                .Include(x => x.Author).ThenInclude(x => x.Avatar)
+                .Include(x => x.Attachments).AsNoTracking().OrderByDescending(x => x.DateTimeCreation).Skip(skip).Take(take)
+                .Select(x => _mapper.Map<PostModel>(x))
+                .ToListAsync();
+
+            return posts;
+        }
         public async Task<AttachModel> GetPostContent(Guid contentId)
         {
             var content = await _context.Attaches.FirstOrDefaultAsync(a=>a.Id == contentId);
@@ -63,7 +74,7 @@ namespace Api.Services
             var post = await _context.Posts.FirstOrDefaultAsync(p=>p.Id == likeRequest.PostId);
             if (post == default)
             {
-                throw new Exception("Post not found");
+                throw new PostNotFoundException();
             }
             var like = await _context.Likes.FirstOrDefaultAsync(l=>l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
             if (like != default)
@@ -81,7 +92,7 @@ namespace Api.Services
             var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == likeRequest.PostId);
             if (post == default)
             {
-                throw new Exception("Post not found");
+                throw new PostNotFoundException();
             }
             var like = await _context.Likes.FirstOrDefaultAsync(l => l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
             if (like == default)

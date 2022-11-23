@@ -2,6 +2,7 @@
 using Api.Mapper;
 using Api.Middleware;
 using Api.Services;
+using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -63,6 +64,13 @@ internal class Program
         {
             options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql"), sql => { }); //указали имя строки подключения из appsettings.json
         }, contextLifetime: ServiceLifetime.Scoped);
+
+        builder.Services.AddOptions();
+        builder.Services.AddMemoryCache();
+        builder.Services.Configure<ClientRateLimitOptions>(builder.Configuration.GetSection("ClientRateLimiting"));
+        builder.Services.Configure<ClientRateLimitPolicies>(builder.Configuration.GetSection("ClientRateLimitPolicies"));
+        builder.Services.AddInMemoryRateLimiting();
+        builder.Services.AddSingleton<IRateLimitConfiguration, RateLimitConfiguration>();
 
         builder.Services.AddAutoMapper(typeof(MapperProfile).Assembly);
 

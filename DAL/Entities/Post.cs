@@ -13,6 +13,7 @@ namespace DAL.Entities
         public string? Location { get; set; }
         public DateTimeOffset DateTimeCreation { get; set; }
         public Guid AuthorId { get; set; }
+        public bool IsDeleted { get; set; }
         public virtual User Author { get; set; } = null!;
         public virtual ICollection<PostAttach>? Attachments { get; set; }/* = new List<PostAttach>();*/
         public virtual ICollection<Comment>? Comments { get; set; }

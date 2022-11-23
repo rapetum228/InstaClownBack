@@ -10,6 +10,7 @@ namespace Api.Mapper
     {
         public MapperProfile()
         {
+            //USER
             CreateMap<CreateUserModel, User>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.PasswordHash, m => m.MapFrom(s => PasswordHash.HashPassword(s.Password)))
@@ -25,24 +26,22 @@ namespace Api.Mapper
                 .ForMember(d => d.PostsCount, m => m.MapFrom(s => s.Posts!.Count))
                 .AfterMap<UserAvatarMapperAction>();
 
+            //COMMENT
             CreateMap<CommentRequestModel, Comment>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.DateTimeWriting, m => m.MapFrom(s => s.DateTimeWriting==null?DateTime.UtcNow:s.DateTimeWriting));
             CreateMap<Comment, CommentModel>()
                 .ForMember(d => d.ResponseCommentId, m => m.MapFrom(s => s.ResponseComment!.Id)) ;
             CreateMap<CommentToCommentRequestModel, Comment>()
-                //.ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.DateTimeWriting, m => m.MapFrom(s => s.DateTimeWriting == null ? DateTime.UtcNow : s.DateTimeWriting));
 
+            //ATTACHES AND METADATA
             CreateMap<MetadataModel, MetadataLinkModel>();
             CreateMap<MetadataLinkModel, PostAttach>();
-
             CreateMap<PostAttach, AttachExternalModel>().AfterMap<PostAttachMapperAction>();
             CreateMap<Avatar, AttachModel>();
-            //CreateMap<PostAttach, AttachModel>();
-            //CreateMap<PostAttach, PostAttachOutputModel>()
-            //    .ForMember(pao => pao.ContentUri, pa => pa.MapFrom(s => "/api/Post/GetContent?contentId=" + s.Id));
 
+            //POST
             CreateMap<CreatePostModel, Post>()
                 .ForMember(d => d.Id, m => m.MapFrom(s => Guid.NewGuid()))
                 .ForMember(d => d.Attachments, m => m.MapFrom(s => s.Contents))
@@ -52,6 +51,7 @@ namespace Api.Mapper
                 .ForMember(pm => pm.Contents, p => p.MapFrom(s => s.Attachments))
                 .ForMember(d => d.LikesCount, m => m.MapFrom(s => s.Likes!.Count));
 
+            //LIKE
             CreateMap<LikeRequest, Like>();
 
 

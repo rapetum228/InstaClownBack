@@ -3,22 +3,38 @@
 namespace Api.Exceptions
 {
     [Serializable]
-    internal class NotFoundException : Exception
+    public class NotFoundException : Exception
     {
-        public NotFoundException()
+        public string? Model { get; set; }
+
+        public override string Message => $"{Model} is not found";
+        
+
+    }
+
+    public class UserNotFoundException : NotFoundException
+    {
+        public UserNotFoundException()
         {
+            Model = "User";
         }
 
-        public NotFoundException(string? message) : base(message)
+    }
+    public class PostNotFoundException : NotFoundException
+    {
+        public PostNotFoundException()
         {
+            Model = "Post";
         }
 
-        public NotFoundException(string? message, Exception? innerException) : base(message, innerException)
+    }
+
+    public class CommentNotFoundException : NotFoundException
+    {
+        public CommentNotFoundException()
         {
+            Model = "Comment";
         }
 
-        protected NotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
-        {
-        }
     }
 }

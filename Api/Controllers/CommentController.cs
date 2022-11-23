@@ -39,6 +39,17 @@ namespace Api.Controllers
             await _commentService.AddCommentToPost(commentRequest);
         }
 
+        [HttpPost]
+        [Authorize]
+        public async Task RemoveComment(CommentSimpleModel commentRequest)
+        {
+            if (commentRequest.UserId == default)
+            {
+                var userId = GetCurrentUserId();
+                commentRequest.UserId = userId;
+            }
+            await _commentService.RemoveComment(commentRequest);
+        }
         [HttpGet]
         //[Authorize]
         public async Task<List<CommentModel>> GetPostComments(Guid postId)
