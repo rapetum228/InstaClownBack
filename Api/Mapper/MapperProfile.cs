@@ -54,6 +54,11 @@ namespace Api.Mapper
 
             CreateMap<LikeRequest, Like>();
 
+            CreateMap<MessageRequestModel, MessageCreateModel>()
+                .ForMember(s=>s.SendingTime, m => m.MapFrom(s => s.SendingTime==null?DateTime.UtcNow : s.SendingTime));
+            CreateMap<MessageCreateModel, Message>();
+
+            CreateMap<ChatCreateRequestModel, Chat>();
 
         }
     }

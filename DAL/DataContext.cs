@@ -27,10 +27,11 @@ namespace DAL
                .IsUnique();
             modelBuilder.Entity<Avatar>().ToTable(nameof(Avatars));
             modelBuilder.Entity<PostAttach>().ToTable(nameof(PostAttaches));
+            modelBuilder.Entity<MessageAttach>().ToTable(nameof(MessageAttaches));
 
             modelBuilder.Entity<User>().HasIndex(p => p.Email).IsUnique();
             modelBuilder.Entity<User>().HasIndex(p => p.Name).IsUnique();
-
+           
 
         }
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
@@ -44,5 +45,8 @@ namespace DAL
         public DbSet<Post> Posts => Set<Post>();
         public DbSet<PostAttach> PostAttaches => Set<PostAttach>();
         public DbSet<Like> Likes => Set<Like>();
+        public DbSet<Message> Messages => Set<Message>();
+        public DbSet<Chat> Chats => Set<Chat>();
+        public DbSet<MessageAttach> MessageAttaches => Set<MessageAttach>();
     }
 }
