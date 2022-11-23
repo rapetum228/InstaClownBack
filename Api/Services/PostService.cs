@@ -18,74 +18,100 @@ namespace Api.Services
             _context = context;
         }
 
-        public async Task CreatePost(UserModel userModel, PostCreateModel postCreateModel)
+        public async Task CreatePost(CreatePostRequest postRequest)
         {
-            var user = await _context.Users.FirstOrDefaultAsync(x => x.Id == userModel.Id);
+            var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == postRequest.AuthorId);
             if (user == null)
             {
                 throw new Exception("User not found");
             }
 
-            var post = _mapper.Map<Post>(postCreateModel);
-            post.Author = user;
-            await _context.Posts.AddAsync(post);
-            await _context.SaveChangesAsync();
+            var createPostModel = _mapper.Map<CreatePostModel>(postRequest);
 
-            foreach (var meta in postCreateModel.PostMetas)
+            createPostModel.Contents.ForEach(x =>
             {
-                await AddAttachToPost(meta, post);
-            }
+                MoveAttach(x, createPostModel.AuthorId);
+            });
+
+            var dbModel = _mapper.Map<Post>(createPostModel);
+            await _context.Posts.AddAsync(dbModel);
+            await _context.SaveChangesAsync();
         }
 
         public async Task<ICollection<PostModel>?> GetUserPostsAsync(Guid userId)
         {
-            var posts = _context.Posts.Include(p => p.Attachments).Include(p=>p.Author).Where(p=>p.Author.Id == userId);
+            var posts = await _context.Posts.Include(p => p.Attachments)//.ThenInclude(a=>a.Author)
+                                      .Include(p=>p.Author)
+                                      .ThenInclude(x => x.Avatar)
+                                      .Include(p=>p.Likes)
+                                      .Where(p=>p.AuthorId == userId)
+                                      .OrderByDescending(x => x.DateTimeCreation)
+                                      .AsNoTracking().ToListAsync();
 
             return _mapper.Map<List<PostModel>>(posts);
 
-            //var user = await _context.Users.Include(x => x.Posts).FirstOrDefaultAsync(x => x.Id == userId);
         }
 
-        public async Task<AttachModel> GetContent(Guid contentId)
+        public async Task<AttachModel> GetPostContent(Guid contentId)
         {
             var content = await _context.Attaches.FirstOrDefaultAsync(a=>a.Id == contentId);
             return _mapper.Map<AttachModel>(content);
         } 
 
-        private async Task AddAttachToPost(MetadataModel meta, Post post)
+        public async Task LikePost(LikeRequest likeRequest)
         {
-            
-                var postAttach = new PostAttach
-                {
-                    Author = post.Author,
-                    MimeType = meta.MimeType,
-                    FilePath = GetPath(meta),
-                    Name = meta.Name,
-                    Size = meta.Size
-                };
-            postAttach.Post = post;
-
-            await _context.PostAttaches.AddAsync(postAttach);
-            await _context.SaveChangesAsync();
-
-        } 
-
-        private string GetPath(MetadataModel model)
-        {
-            var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), model.TempId.ToString()));
-            if (!tempFi.Exists)
-                throw new Exception("file not found");
-            else
+            var post = await _context.Posts.FirstOrDefaultAsync(p=>p.Id == likeRequest.PostId);
+            if (post == default)
             {
-                var path = Path.Combine(Directory.GetCurrentDirectory(), "attaches", model.TempId.ToString());
-                var destFi = new FileInfo(path);
+                throw new Exception("Post not found");
+            }
+            var like = await _context.Likes.FirstOrDefaultAsync(l=>l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
+            if (like != default)
+            {
+                throw new Exception("You already liked this post");
+            }
+
+            var likeDb = _mapper.Map<Like>(likeRequest);
+            await _context.Likes.AddAsync(likeDb);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task DislikePost(LikeRequest likeRequest)
+        {
+            var post = await _context.Posts.FirstOrDefaultAsync(p => p.Id == likeRequest.PostId);
+            if (post == default)
+            {
+                throw new Exception("Post not found");
+            }
+            var like = await _context.Likes.FirstOrDefaultAsync(l => l.PostId == likeRequest.PostId && l.UserId == likeRequest.UserId);
+            if (like == default)
+            {
+                throw new Exception("You don't liked this post");
+            }
+
+            
+            _context.Likes.Remove(like);
+            await _context.SaveChangesAsync();
+        }
+        private void MoveAttach(MetadataLinkModel model, Guid authorId)
+        {
+            model.AuthorId = authorId;
+            model.FilePath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "attaches",
+               model.TempId.ToString());
+
+            var tempFi = new FileInfo(Path.Combine(Path.GetTempPath(), model.TempId.ToString()));
+            if (tempFi.Exists)
+            {
+                var destFi = new FileInfo(model.FilePath);
                 if (destFi.Directory != null && !destFi.Directory.Exists)
                     destFi.Directory.Create();
 
-                System.IO.File.Copy(tempFi.FullName, path, true);
-
-                return path;    
+                File.Move(tempFi.FullName, model.FilePath, true);
             }
         }
+
+
     }
 }

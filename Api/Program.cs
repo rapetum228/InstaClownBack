@@ -1,5 +1,5 @@
-﻿using Api;
-using Api.Configs;
+﻿using Api.Configs;
+using Api.Mapper;
 using Api.Middleware;
 using Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -69,6 +69,8 @@ internal class Program
         builder.Services.AddScoped<UserService>();
         builder.Services.AddScoped<AuthService>(); 
         builder.Services.AddScoped<PostService>();
+        builder.Services.AddScoped<LinkGeneratorService>();
+        builder.Services.AddScoped<CommentService>();
 
         builder.Services.AddAuthentication(o =>
         {

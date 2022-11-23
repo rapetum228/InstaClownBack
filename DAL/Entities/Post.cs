@@ -12,9 +12,10 @@ namespace DAL.Entities
         public string Description { get; set; } = null!;
         public string? Location { get; set; }
         public DateTimeOffset DateTimeCreation { get; set; }
-        //public Guid AuthorId { get; set; }
+        public Guid AuthorId { get; set; }
         public virtual User Author { get; set; } = null!;
-        public virtual ICollection<PostAttach>? Attachments { get; set; } = new List<PostAttach>();
+        public virtual ICollection<PostAttach>? Attachments { get; set; }/* = new List<PostAttach>();*/
         public virtual ICollection<Comment>? Comments { get; set; }
+        public virtual ICollection<Like>? Likes { get; set; }
     }
 }
