@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Api.Controllers
 {
-    [Route("api/[controller]/[action]")] //in default "api/[controller]". Addition [action] views controller method names (CreateUser,GetUsers..)
+    [Route("api/[controller]/[action]")] 
     [ApiController]
     public class UserController : ControllerBase
     {
@@ -22,8 +22,6 @@ namespace Api.Controllers
             _userService = userService;
         }
 
-        //url with action: api/User/CreateUser
-        //url without action: api/User
         [HttpPost]
         public async Task CreateUser(CreateUserModel model)=> await _userService.CreateUser(model);
 
@@ -69,6 +67,41 @@ namespace Api.Controllers
             else
                 throw new Exception("you are not authorized");
 
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task SubscribeToUser(Guid userId, Guid? subscriberId)
+        {
+            if (subscriberId == default)
+            {
+                var currentUser = await GetCurrentUser();
+                subscriberId = currentUser.Id;
+            }
+            await _userService.SubscribeToUser(userId, subscriberId!.Value);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task UnsubscribeFromUser(Guid userId, Guid? subscriberId)
+        {
+            if (subscriberId == default)
+            {
+                var currentUser = await GetCurrentUser();
+                subscriberId = currentUser.Id;
+            }
+            await _userService.UnsubscribeFromUser(userId, subscriberId!.Value);
+        }
+
+        [HttpGet]
+        public async Task<List<UserSimpleModel>> GetUserSubscriptions(Guid userId)
+        {
+            return await _userService.GetUserSubscriptions(userId);
+        }
+        [HttpGet]
+        public async Task<List<UserSimpleModel>> GetUserSubscribers(Guid userId)
+        {
+            return await _userService.GetUserSubscribers(userId);
         }
 
         [HttpGet]

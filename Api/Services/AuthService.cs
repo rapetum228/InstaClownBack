@@ -28,7 +28,7 @@ namespace Api.Services
         {
             var user = await _context.Users.FirstOrDefaultAsync(x => x.Email.ToLower() == login.ToLower());
             if (user == null)
-                throw new NotFoundException("User not found!");
+                throw new UserNotFoundException();
 
             if (!PasswordHash.ValidatePassword(password, user.PasswordHash))
                 throw new Exception("Okay give me correct p[ass]word"); //Password is incorrect

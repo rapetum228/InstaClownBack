@@ -5,14 +5,21 @@
 namespace Api.Migrations
 {
     /// <inheritdoc />
-    public partial class UserUpdated : Migration
+    public partial class SoftDelete : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AddColumn<bool>(
                 name: "IsDeleted",
-                table: "Users",
+                table: "Posts",
+                type: "boolean",
+                nullable: false,
+                defaultValue: false);
+
+            migrationBuilder.AddColumn<bool>(
+                name: "IsDeleted",
+                table: "Comments",
                 type: "boolean",
                 nullable: false,
                 defaultValue: false);
@@ -23,7 +30,11 @@ namespace Api.Migrations
         {
             migrationBuilder.DropColumn(
                 name: "IsDeleted",
-                table: "Users");
+                table: "Posts");
+
+            migrationBuilder.DropColumn(
+                name: "IsDeleted",
+                table: "Comments");
         }
     }
 }
