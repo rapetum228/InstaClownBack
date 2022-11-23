@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221109025721_AddPost")]
-    partial class AddPost
+    [Migration("20221122230140_subscribes")]
+    partial class subscribes
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -70,6 +70,9 @@ namespace Api.Migrations
                     b.Property<Guid>("PostId")
                         .HasColumnType("uuid");
 
+                    b.Property<Guid?>("ResponseCommentId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Text")
                         .IsRequired()
                         .HasColumnType("text");
@@ -81,9 +84,32 @@ namespace Api.Migrations
 
                     b.HasIndex("PostId");
 
+                    b.HasIndex("ResponseCommentId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("Comments");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Like", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("PostId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Likes");
                 });
 
             modelBuilder.Entity("DAL.Entities.Post", b =>
@@ -139,9 +165,6 @@ namespace Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid?>("UserId")
-                        .HasColumnType("uuid");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AvatarId")
@@ -152,8 +175,6 @@ namespace Api.Migrations
 
                     b.HasIndex("Name")
                         .IsUnique();
-
-                    b.HasIndex("UserId");
 
                     b.ToTable("Users");
                 });
@@ -181,6 +202,21 @@ namespace Api.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("UserSessions");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.Property<Guid>("SubscribersId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("SubscriptionsId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("SubscribersId", "SubscriptionsId");
+
+                    b.HasIndex("SubscriptionsId");
+
+                    b.ToTable("UserUser");
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>
@@ -221,6 +257,31 @@ namespace Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("DAL.Entities.Comment", "ResponseComment")
+                        .WithMany()
+                        .HasForeignKey("ResponseCommentId");
+
+                    b.HasOne("DAL.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Post");
+
+                    b.Navigation("ResponseComment");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("DAL.Entities.Like", b =>
+                {
+                    b.HasOne("DAL.Entities.Post", "Post")
+                        .WithMany("Likes")
+                        .HasForeignKey("PostId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("DAL.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -249,10 +310,6 @@ namespace Api.Migrations
                         .WithOne("User")
                         .HasForeignKey("DAL.Entities.User", "AvatarId");
 
-                    b.HasOne("DAL.Entities.User", null)
-                        .WithMany("Subscribers")
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Avatar");
                 });
 
@@ -265,6 +322,21 @@ namespace Api.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("UserUser", b =>
+                {
+                    b.HasOne("DAL.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscribersId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Entities.User", null)
+                        .WithMany()
+                        .HasForeignKey("SubscriptionsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>
@@ -298,6 +370,8 @@ namespace Api.Migrations
                     b.Navigation("Attachments");
 
                     b.Navigation("Comments");
+
+                    b.Navigation("Likes");
                 });
 
             modelBuilder.Entity("DAL.Entities.User", b =>
@@ -305,8 +379,6 @@ namespace Api.Migrations
                     b.Navigation("Posts");
 
                     b.Navigation("Sessions");
-
-                    b.Navigation("Subscribers");
                 });
 
             modelBuilder.Entity("DAL.Entities.Avatar", b =>
